@@ -1,0 +1,85 @@
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #e8edea;
+}
+
+.container-fluid {
+    background: #343a40;
+    padding: 20px;
+}
+
+
+.flag {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 15%;
+    margin-bottom: 10px;
+}
+
+.header-box {
+    text-align: center;
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.active {
+    font-weight: bold;
+}
+
+.col-md-4 {
+    margin-top: 10px;
+    float: left;
+    width: 33.33333%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.cases {
+    color: #fdfdfe;
+}
+
+.deaths {
+    color: #c30000;
+}
+
+.recover {
+    color: green;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #777;
+    color: white;
+    text-align: center;
+}
+
+.table-fixed {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table-fixed tbody {
+    display: block;
+    height: 200px;
+    overflow-y: auto;
+    max-width: 100%
+}
+
+.table-fixed thead tr {
+    display: block;
+}
+
+.table-fixed th, td{
+    padding: 5px;
+    width: 25%;
+}

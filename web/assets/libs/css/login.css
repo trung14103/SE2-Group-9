@@ -1,0 +1,81 @@
+body {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Roboto', sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+
+.container {
+  background-color:#ffffff; 
+  padding: 10px;
+  border: 1px;
+  border-radius: 25px;
+  outline: none;
+}
+
+/** Login Form **/
+.login-header{
+  text-align: center;
+  margin-bottom: 20px
+}
+
+.login-img {
+  width: 100%;
+}
+
+.input-container {
+  background-color: #E5E5E5;
+  /* vertically align icon and text inside the div*/
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.input-container:hover {
+  background-color: #eaeaea;
+}
+
+.input-container,
+#input-submit {
+  height: 60px;
+  border-radius: 30px;
+  width: 100%;
+}
+
+.input-field {
+  /* customize the input tag with lighter font and some padding*/
+  color: #6b6b6b;
+  background-color: inherit;
+  width: 90%;
+  border: none;
+  font-size: 1.3rem;
+  font-weight: 400;
+  padding-left: 30px;
+}
+
+.input-field:hover,
+.input-field:focus {
+  /* remove the outline */
+  outline: none;
+}
+
+#input-submit {
+  /* submit button has a different color and different padding */
+  background-color: rgb(90, 184, 90);
+  padding-left: 0;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+#input-submit:hover {
+  background-color: rgb(100, 100, 100);
+  transition: background-color,
+      1s;
+  cursor: pointer;
+}
