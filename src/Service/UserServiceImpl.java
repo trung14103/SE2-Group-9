@@ -3,10 +3,7 @@ package Service;
 import Model.User;
 import Utils.DBConnect;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private static String INSERT_USER = "INSERT INTO users ( username, password, email, address, role, created_date) VALUES (?, ?, ?, ?, ?, ?);";
 
-    private static String SELECT_USER_BY_NAME_PASSWORD = "SELECT * FROM users WHERE username = ?, password = ?;";
+    private static String SELECT_USER_BY_NAME_PASSWORD = "SELECT * FROM users WHERE username = ? AND password = ?;";
 
     @Override
 
@@ -62,8 +59,8 @@ public class UserServiceImpl implements UserService {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getEmail());
-            ps.setString(4, user.getRole());
-            ps.setString(5, user.getAddress());
+            ps.setString(5, user.getRole());
+            ps.setString(4, user.getAddress());
             ps.executeUpdate();
             con.close();
         } catch (SQLException throwables) {
@@ -81,6 +78,9 @@ public class UserServiceImpl implements UserService {
             ps.setString(3, user.getEmail());
             ps.setString(4, user.getRole());
             ps.setString(5, user.getAddress());
+            ps.setDate(6, convertDate(user.getCreated_date()));
+            ps.executeUpdate();
+            con.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -115,6 +115,7 @@ public class UserServiceImpl implements UserService {
         try {
             PreparedStatement ps = con.prepareStatement(DELETE_USER_BY_ID);
             ps.setLong(1, id);
+            ps.executeUpdate();
             con.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -122,20 +123,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean login(String username, String password) {
+    public String login(String username, String password) {
         Connection con = DBConnect.getConnection();
-        boolean isSuccess = false;
+        String role = "";
         try {
             PreparedStatement ps = con.prepareStatement(SELECT_USER_BY_NAME_PASSWORD);
+            ps.setString(1, username);
+            ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                con.close();
-                isSuccess = true;
+            while (rs.next()) {
+                role = rs.getString("role");
             }
+            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return isSuccess;
+        return role;
     }
 
     @Override
@@ -166,11 +169,15 @@ public class UserServiceImpl implements UserService {
         if (!username.isEmpty()) {
             User flagUser = findUserByName(username);
             if (oldUsername == null) {
-                return flagUser == null;
+                return flagUser.getUsername() == null;
             } else {
                 return username.equals(oldUsername) || flagUser == null;
             }
         }
         return true;
+    }
+
+    private Date convertDate(java.util.Date dateUtil) {
+        return new Date(dateUtil.getTime());
     }
 }

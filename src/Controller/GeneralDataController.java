@@ -1,8 +1,9 @@
 package Controller;
 
-import Service.GeneralDataService;
+import Model.City;
+import Model.Country;
+import Service.*;
 import Model.GeneralData;
-
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,8 +18,14 @@ import java.util.List;
 public class GeneralDataController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private GeneralDataService generalDataService;
+    private   CountryService countryService;
+    private  CityService cityService;
 
-
+    public void init() {
+        countryService = new CountryServiceImpl();
+        cityService = new CityServiceImpl();
+        generalDataService = new GeneralDataServiceImpl();
+    }
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         doGet(request, response);
@@ -29,23 +36,22 @@ public class GeneralDataController extends HttpServlet {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
 
-        //TO-DO: Implement switch-case structure for page navigation with request-response
         try {
-            String action = request.getParameter("action");
-            switch (action) {
-                case "New":
+            String command = request.getParameter("command");
+            switch (command) {
+                case "new":
                     showNewForm(request, response);
                     break;
-                case "Insert":
+                case "insert":
                     insertGeneralData(request, response);
                     break;
-                case "Edit":
+                case "edit":
                     showEditForm(request, response);
                     break;
-                case "Update":
+                case "update":
                     updateGeneralData(request, response);
                     break;
-                case "Delete":
+                case "delete":
                     deleteGeneralData(request, response);
                     break;
                 default:
@@ -61,13 +67,13 @@ public class GeneralDataController extends HttpServlet {
             throws SQLException, IOException, ServletException {
         List<GeneralData> GeneralDataList = generalDataService.findAll();
         request.setAttribute("listGeneralData", GeneralDataList);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("list.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("covid-data-view.jsp");
         dispatcher.forward(request, response);
     }
 
     void showNewForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("GeneralDataForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("covid-data-form.jsp");
         dispatcher.forward(request, response);
     }
 
@@ -76,44 +82,68 @@ public class GeneralDataController extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         GeneralData GeneralData = generalDataService.findGeneralDataById(id);
         request.setAttribute("GeneralData", GeneralData);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("GeneralDataForm.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("covid-data-form.jsp");
         dispatcher.forward(request, response);
     }
 
     void insertGeneralData(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
+            throws SQLException, IOException, ServletException {
         int recovered = Integer.parseInt(request.getParameter("recovered"));
         int infected = Integer.parseInt(request.getParameter("infected"));
         int critical = Integer.parseInt(request.getParameter("critical"));
         int death = Integer.parseInt(request.getParameter("death"));
-        int country_id = Integer.parseInt(request.getParameter("country_id"));
-        int city_id = Integer.parseInt(request.getParameter("city_id"));
-        GeneralData GeneralData = new GeneralData(id, recovered, infected, critical, death, country_id, city_id);
-        generalDataService.createGeneralData(GeneralData);
-        response.sendRedirect(request.getContextPath() + "/GeneralData?action=List");
+        long country_id = Integer.parseInt(request.getParameter("country_id"));
+        long city_id = Integer.parseInt(request.getParameter("city_id"));
+        Country country = countryService.findCountryById(country_id);
+        City city = cityService.findCityById(city_id);
+        if (country != null) {
+            GeneralData generalData = new GeneralData();
+            generalData.setRecovered(recovered);
+            generalData.setInfected(infected);
+            generalData.setCritical(critical);
+            generalData.setDeath(death);
+            generalData.setCity_id(city_id);
+            generalData.setCountry_id(country_id);
+            generalData.setCountry(country);
+            generalData.setCity(city);
+            generalDataService.createGeneralData(generalData);
+            response.sendRedirect(request.getContextPath() + "/generalData?command=list");
+        }
+        else {
+            String err = "City or Country is not existed";
+            request.setAttribute("err", err);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=new");
+            dispatcher.forward(request, response);
+        };
     }
 
     void updateGeneralData(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
+            throws SQLException, IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
         int recovered = Integer.parseInt(request.getParameter("recovered"));
         int infected = Integer.parseInt(request.getParameter("infected"));
         int critical = Integer.parseInt(request.getParameter("critical"));
         int death = Integer.parseInt(request.getParameter("death"));
-        int country_id = Integer.parseInt(request.getParameter("country_id"));
-        int city_id = Integer.parseInt(request.getParameter("city_id"));
-        GeneralData GeneralData = new GeneralData(id, recovered, infected, critical, death, country_id, city_id);
-        generalDataService.updateGeneralData(GeneralData);
-        response.sendRedirect(request.getContextPath() + "/GeneralData?action=List");
+        long country_id = Integer.parseInt(request.getParameter("country_id"));
+        long city_id = Integer.parseInt(request.getParameter("city_id"));
+        Country country = countryService.findCountryById(country_id);
+        City city = cityService.findCityById(city_id);
+        if (country != null) {
+            GeneralData GeneralData = new GeneralData(id, recovered, infected, critical, death, country_id, city_id,country,city);
+            generalDataService.updateGeneralData(GeneralData);
+            response.sendRedirect(request.getContextPath() + "/generalData?command=list");}
+        else {
+            String err = "City or Country is not existed";
+            request.setAttribute("err", err);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=new");
+            dispatcher.forward(request, response);
+        };
     }
 
     void deleteGeneralData(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         generalDataService.deleteGeneralData(id);
-        response.sendRedirect(request.getContextPath() + "/GeneralData?action=List");
+        response.sendRedirect(request.getContextPath() + "/generalData?command=list");
     }
-
-
 }

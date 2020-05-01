@@ -2,6 +2,7 @@ package Controller;
 
 import Model.Country;
 import Service.CountryService;
+import Service.CountryServiceImpl;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -22,101 +23,88 @@ public class CountryController extends HttpServlet {
     private static final String dateFormat = "yyyy-MM-dd";
 
     private CountryService countryService;
-
-    public CountryController() {
-        super();
-    }
+	public void init() {
+		countryService = new CountryServiceImpl();
+ 	}
 
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
- 		String command = req.getParameter("command");
-		try {
-			switch(command) {	
-			case "new":
-			 showNewForm(req, res);
-			 	break;
-			case "insert":
-	            insertCountry(req, res);
-	            break;
-			case "edit":
-                showEditForm(req, res);
-                break;
-            case "update":
-                updateCountry(req, res);
-                break;
-            case "delete":
-                deleteCountry(req, res);
-                break;
-            default:
-               listCountry(req, res);
-                break;
-			}
-		} catch(SQLException e){
-			e.printStackTrace();
-		}
-	}
-    
-    private void listCountry(HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, IOException, ServletException {
-			List<Country> listCountry = countryService.findAll();
-			request.setAttribute("listCountry", listCountry);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/country-list.jsp");
-			dispatcher.forward(request, response);
-	}
-    
-    private void showNewForm(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
-			RequestDispatcher rd =  req.getRequestDispatcher("/country-form.jsp");
-			rd.forward(req, res); 
-	}
-    
-    private void showEditForm(HttpServletRequest req, HttpServletResponse res)
-			throws SQLException, ServletException, IOException {
-    		Long id = Long.parseLong(req.getParameter("id"));
-    		Country existingCountry = countryService.findCountryById(id);
-        
-    		RequestDispatcher rd =  req.getRequestDispatcher("/country-form.jsp");
-    		req.setAttribute("country", existingCountry);
-    		rd.forward(req, res); 
-	}
-    
-    private void insertCountry(HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, IOException {
-    		Country country = new Country();
-
-    		country.setName(request.getParameter("name"));   		
-    		country.setUpdated_day(convertToDate(request.getParameter("updated_day")));
-    		country.setContinent(request.getParameter("continent"));
-    		countryService.createCountry(country);
-    		response.sendRedirect(request.getServletPath() + "?command=list");
-	}
-    
-    private void updateCountry(HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, IOException {		
-    		Country country = new Country();
-    		country.setName(request.getParameter("name"));   		
-    		country.setUpdated_day(convertToDate(request.getParameter("updated_day")));
-    		country.setContinent(request.getParameter("continent"));
-    		country.setId(Long.parseLong(request.getParameter("id")));
-
-    		countryService.updateCountry(country);
-    		response.sendRedirect(request.getServletPath() + "?command=list");
-		    
-	}
-    
-    private void deleteCountry(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
-        	Long id = Long.parseLong(request.getParameter("id"));
-        	countryService.deleteCountry(id);
-        	response.sendRedirect(request.getServletPath() + "?command=list");
+        req.setCharacterEncoding("utf-8");
+        res.setCharacterEncoding("utf-8");
+        String command = req.getParameter("command");
+        try {
+            switch (command) {
+                case "new":
+                    showNewForm(req, res);
+                    break;
+                case "insert":
+                    insertCountry(req, res);
+                    break;
+                case "edit":
+                    showEditForm(req, res);
+                    break;
+                case "update":
+                    updateCountry(req, res);
+                    break;
+                case "delete":
+                    deleteCountry(req, res);
+                    break;
+                default:
+                    listCountry(req, res);
+                    break;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-    
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    private void listCountry(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        List<Country> listCountry = countryService.findAll();
+        request.setAttribute("listCountry", listCountry);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/country-view.jsp");
+        dispatcher.forward(request, response);
+    }
+
+    private void showNewForm(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        RequestDispatcher rd = req.getRequestDispatcher("/country-form.jsp");
+        rd.forward(req, res);
+    }
+
+    private void showEditForm(HttpServletRequest req, HttpServletResponse res)
+            throws SQLException, ServletException, IOException {
+        Long id = Long.parseLong(req.getParameter("id"));
+        Country existingCountry = countryService.findCountryById(id);
+
+        RequestDispatcher rd = req.getRequestDispatcher("/country-form.jsp");
+        req.setAttribute("country", existingCountry);
+        rd.forward(req, res);
+    }
+
+    private void insertCountry(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        Country country = new Country();
+        String name = request.getParameter("name");
+
+        if (countryService.checkExistCountry(name, null)) {
+            country.setName(request.getParameter("name"));
+            country.setUpdated_day(new Date());
+            country.setContinent(request.getParameter("continent"));
+            countryService.createCountry(country);
+            response.sendRedirect(request.getServletPath() + "?command=list");
+        } else {
+            RequestDispatcher rd = request.getRequestDispatcher("/country-form.jsp");
+            request.setAttribute("err", "Country is already existed");
+            rd.forward(request, response);
+        }
+    }
+
+    private void updateCountry(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
-        Long id = Long.parseLong(request.getParameter("id"));
-        String name = request.getParameter("name");
         Country country = new Country();
-        Date updated_day =  convertToDate(request.getParameter("updated_day"));
+        String name = request.getParameter("name");
         String continent = request.getParameter("continent");
 
         String err = "";
@@ -125,7 +113,7 @@ public class CountryController extends HttpServlet {
         if (name.isEmpty() || continent.isEmpty()) {
             err = "Please fill in necessary information";
         }
-        
+
 
         if (err.length() > 0) {
             request.setAttribute("error", err);
@@ -133,27 +121,33 @@ public class CountryController extends HttpServlet {
 
         try {
             if (err.length() == 0) {
-                 country = new Country(id, name, updated_day, continent);
-                 countryService.updateCountry(country);
-                url = "/home.jsp";
+                country.setName(request.getParameter("name"));
+                country.setUpdated_day(new Date());
+                country.setContinent(request.getParameter("continent"));
+                country.setId(Long.parseLong(request.getParameter("id")));
+
+                countryService.updateCountry(country);
+                response.sendRedirect(request.getServletPath() + "?command=list");
             } else {
                 url = "/country-form.jsp";
+                RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(url);
+                requestDispatcher.forward(request, response);
             }
-            RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(url);
-            requestDispatcher.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
-    private static Date convertToDate(String dateString) {
-        Date date = null;
-        try {
-            date = new SimpleDateFormat(dateFormat).parse(dateString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date;
+    private void deleteCountry(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        Long id = Long.parseLong(request.getParameter("id"));
+        countryService.deleteCountry(id);
+        response.sendRedirect(request.getServletPath() + "?command=list");
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
     }
 }
 

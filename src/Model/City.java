@@ -20,5 +20,12 @@ public class City {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "country_id")
+    private Long countryId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private Country country;
+
 }
 

@@ -10,7 +10,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeneralDataServiceImpl implements GeneralDataService{
+public class GeneralDataServiceImpl implements GeneralDataService {
+
+    private CityService cityService = new CityServiceImpl();
+    private CountryService countryService = new CountryServiceImpl();
 
     @Override
     public GeneralData findGeneralDataById(int id) {
@@ -18,8 +21,8 @@ public class GeneralDataServiceImpl implements GeneralDataService{
         List<GeneralData> GeneralDataList = new ArrayList<>();
         GeneralData GeneralData = new GeneralData();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM GeneralData WHERE id = ?");
-            ps.setInt(1,id);
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM covid_data WHERE id = ?");
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 GeneralData.setId(rs.getInt("id"));
@@ -27,9 +30,10 @@ public class GeneralDataServiceImpl implements GeneralDataService{
                 GeneralData.setInfected(rs.getInt("infected"));
                 GeneralData.setCritical(rs.getInt("critical"));
                 GeneralData.setDeath(rs.getInt("death"));
-                GeneralData.setCountry_id(rs.getInt("country_id"));
-                GeneralData.setCity_id(rs.getInt("city_id"));
-
+                GeneralData.setCountry_id(rs.getLong("country_id"));
+                GeneralData.setCity_id(rs.getLong("city_id"));
+                GeneralData.setCity(cityService.findCityById(rs.getLong("city_id")));
+                GeneralData.setCountry(countryService.findCountryById(rs.getLong("country_id")));
             }
             con.close();
         } catch (SQLException throwables) {
@@ -44,7 +48,7 @@ public class GeneralDataServiceImpl implements GeneralDataService{
         Connection con = DBConnect.getConnection();
         List<GeneralData> GeneralDataList = new ArrayList<>();
         try {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM GeneralData");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM covid_data");
 
             ResultSet rs = ps.executeQuery();
 
@@ -55,8 +59,10 @@ public class GeneralDataServiceImpl implements GeneralDataService{
                 GeneralData.setInfected(rs.getInt("infected"));
                 GeneralData.setCritical(rs.getInt("critical"));
                 GeneralData.setDeath(rs.getInt("death"));
-                GeneralData.setCountry_id(rs.getInt("country_id"));
-                GeneralData.setCity_id(rs.getInt("city_id"));
+                GeneralData.setCountry_id(rs.getLong("country_id"));
+                GeneralData.setCity_id(rs.getLong("city_id"));
+                GeneralData.setCity(cityService.findCityById(rs.getLong("city_id")));
+                GeneralData.setCountry(countryService.findCountryById(rs.getLong("country_id")));
                 GeneralDataList.add(GeneralData);
             }
             con.close();
@@ -70,19 +76,19 @@ public class GeneralDataServiceImpl implements GeneralDataService{
     @Override
     public void updateGeneralData(GeneralData GeneralData) {
         Connection con = DBConnect.getConnection();
-        String sql ="UPDATE GeneralData SET recovered = ?, infected = ?,critical = ?, death = ?, country_id = ?," +
+        String sql = "UPDATE covid_data SET recovered = ?, infected = ?,critical = ?, death = ?, country_id = ?," +
                 "city_id = ? WHERE id = ?";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1,GeneralData.getRecovered());
-            ps.setInt(2,GeneralData.getInfected());
-            ps.setInt(3,GeneralData.getCritical());
-            ps.setInt(4,GeneralData.getDeath());
-            ps.setInt(5,GeneralData.getCountry_id());
-            ps.setInt(6,GeneralData.getCity_id());
-            ps.setInt(7,GeneralData.getId());
+            ps.setInt(1, GeneralData.getRecovered());
+            ps.setInt(2, GeneralData.getInfected());
+            ps.setInt(3, GeneralData.getCritical());
+            ps.setInt(4, GeneralData.getDeath());
+            ps.setLong(5, GeneralData.getCountry_id());
+            ps.setLong(6, GeneralData.getCity_id());
+            ps.setInt(7, GeneralData.getId());
             ps.executeUpdate();
-        }catch (SQLException throwables) {
+        } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
@@ -90,18 +96,18 @@ public class GeneralDataServiceImpl implements GeneralDataService{
     @Override
     public void createGeneralData(GeneralData GeneralData) {
         Connection con = DBConnect.getConnection();
-        String sql ="INSERT INTO GeneralData (recovered, infected, critical, death, country_id, city_id) VALUES" +
+        String sql = "INSERT INTO covid_data (recovered, infected, critical, death, country_id, city_id) VALUES" +
                 "(?,?,?,?,?,?)";
         try {
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setInt(1,GeneralData.getRecovered());
-            ps.setInt(2,GeneralData.getInfected());
-            ps.setInt(3,GeneralData.getCritical());
-            ps.setInt(4,GeneralData.getDeath());
-            ps.setInt(5,GeneralData.getCountry_id());
-            ps.setInt(6,GeneralData.getCity_id());
+            ps.setInt(1, GeneralData.getRecovered());
+            ps.setInt(2, GeneralData.getInfected());
+            ps.setInt(3, GeneralData.getCritical());
+            ps.setInt(4, GeneralData.getDeath());
+            ps.setLong(5, GeneralData.getCountry_id());
+            ps.setLong(6, GeneralData.getCity_id());
             ps.executeUpdate();
-        }catch (SQLException throwables) {
+        } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
     }
@@ -110,7 +116,7 @@ public class GeneralDataServiceImpl implements GeneralDataService{
     public void deleteGeneralData(int id) {
         Connection con = DBConnect.getConnection();
         try {
-            PreparedStatement ps = con.prepareStatement("DELETE FROM GeneralData WHERE id = ?");
+            PreparedStatement ps = con.prepareStatement("DELETE FROM covid_data WHERE id = ?");
             ps.setInt(1, id);
             ps.executeUpdate();
             con.close();
@@ -118,6 +124,4 @@ public class GeneralDataServiceImpl implements GeneralDataService{
             throwables.printStackTrace();
         }
     }
-
-
 }

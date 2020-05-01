@@ -16,4 +16,7 @@ public interface CityService {
 
     void deleteCity(Long id);
 
+    boolean checkExistCity(String cityName, String oldCityName);
+
+    City findCityByName(String cityName);
 }

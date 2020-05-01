@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBConnect {
-    private static String DB_URL = "jdbc:mysql://localhost:3306/userdb?useSSL=false";
+    private static String DB_URL = "jdbc:mysql://localhost:3306/covid-19?useSSL=false";
     private static String USER_NAME = "root";
     private static String PASSWORD = "123456789";
 

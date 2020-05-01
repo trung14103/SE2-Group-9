@@ -34,7 +34,7 @@ public class CountryServiceImpl implements CountryService {
             	Country country = new Country();
                 country.setId(rs.getLong("id"));
                 country.setName(rs.getString("name"));
-//                country.setUpdatedDay(rs.getDate("updated_day"));
+                country.setUpdated_day(rs.getDate("updated_day"));
                 country.setContinent(rs.getString("continent"));
             	countryList.add(country);
             }
@@ -53,7 +53,7 @@ public class CountryServiceImpl implements CountryService {
         try {
             PreparedStatement ps = con.prepareStatement(UPDATE_COUNTRY_BY_ID);
             ps.setString(1, country.getName());
-            ps.setDate(2, (Date) country.getUpdated_day());
+            ps.setDate(2, convertDate(country.getUpdated_day()));
             ps.setString(3, country.getContinent());
             ps.executeUpdate();
             con.close();
@@ -68,8 +68,10 @@ public class CountryServiceImpl implements CountryService {
         try {
             PreparedStatement ps = con.prepareStatement(INSERT_COUNTRY);
             ps.setString(1, country.getName());
-            ps.setDate(2, (Date) country.getUpdated_day());
+            ps.setDate(2, convertDate(country.getUpdated_day()));
             ps.setString(3, country.getContinent());
+            ps.executeUpdate();
+            con.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -134,11 +136,15 @@ public class CountryServiceImpl implements CountryService {
         if (!countryName.isEmpty()) {
             Country flagUser = findCountryByName(countryName);
             if (oldCountryName == null) {
-                return flagUser == null;
+                return flagUser.getId() == null;
             } else {
-                return countryName.equals(oldCountryName) || flagUser == null;
+                return countryName.equals(oldCountryName) || flagUser.getId()  == null;
             }
         }
         return true;
+    }
+
+    private Date convertDate(java.util.Date dateUtil) {
+        return new Date(dateUtil.getTime());
     }
 }

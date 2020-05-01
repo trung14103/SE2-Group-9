@@ -1,7 +1,11 @@
 package Controller;
 
 import Model.City;
-import Service.CityService;;
+import Model.Country;
+import Service.CityService;
+import Service.CityServiceImpl;
+import Service.CountryService;
+import Service.CountryServiceImpl;;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.RequestDispatcher;
@@ -11,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -20,121 +25,138 @@ public class CityController extends HttpServlet {
     private static final String dateFormat = "yyyy-MM-dd";
 
     private CityService cityService;
+    private CountryService countryService;
 
-    public CityController() {
-        super();
+    public void init() {
+        cityService = new CityServiceImpl();
+        countryService = new CountryServiceImpl();
     }
-    
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
- 		String command = req.getParameter("command");
-		try {
-			switch(command) {	
-			case "new":
-			 showNewForm(req, res);
-			 	break;
-			case "insert":
-	            insertCity(req, res);
-	            break;
-			case "edit":
-                showEditForm(req, res);
-                break;
-            case "update":
-                updateCity(req, res);
-                break;
-            case "delete":
-                deleteCity(req, res);
-                break;
-            default:
-               listCity(req, res);
-                break;
-			}
-		} catch(SQLException e){
-			e.printStackTrace();
-		}
-	}
-    
+        req.setCharacterEncoding("utf-8");
+        res.setCharacterEncoding("utf-8");
+        String command = req.getParameter("command");
+        try {
+            switch (command) {
+                case "new":
+                    showNewForm(req, res);
+                    break;
+                case "insert":
+                    insertCity(req, res);
+                    break;
+                case "edit":
+                    showEditForm(req, res);
+                    break;
+                case "update":
+                    updateCity(req, res);
+                    break;
+                case "delete":
+                    deleteCity(req, res);
+                    break;
+                default:
+                    listCity(req, res);
+                    break;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void listCity(HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, IOException, ServletException {
-			List<City> listCity = cityService.findAll();
-			request.setAttribute("listCity", listCity);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/city-list.jsp");
-			dispatcher.forward(request, response);
-	}
+            throws SQLException, IOException, ServletException {
+        List<City> listCity = cityService.findAll();
+        request.setAttribute("listCity", listCity);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/city-view.jsp");
+        dispatcher.forward(request, response);
+    }
 
     private void showNewForm(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
-			RequestDispatcher rd =  req.getRequestDispatcher("/city-form.jsp");
-			rd.forward(req, res); 
-	}
-    
+            throws ServletException, IOException {
+        RequestDispatcher rd = req.getRequestDispatcher("/city-form.jsp");
+        rd.forward(req, res);
+    }
+
     private void showEditForm(HttpServletRequest req, HttpServletResponse res)
-			throws SQLException, ServletException, IOException {
-    		Long id = Long.parseLong(req.getParameter("id"));
-    		City existingCity = cityService.findCityById(id);
-        
-    		RequestDispatcher rd =  req.getRequestDispatcher("/city-form.jsp");
-    		req.setAttribute("city", existingCity);
-    		rd.forward(req, res); 
-	}
-    
-    private void insertCity(HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, IOException {
-    		City city = new City();
+            throws SQLException, ServletException, IOException {
+        Long id = Long.parseLong(req.getParameter("id"));
+        City existingCity = cityService.findCityById(id);
 
-    		city.setName(request.getParameter("name"));
+        RequestDispatcher rd = req.getRequestDispatcher("/city-form.jsp");
+        req.setAttribute("city", existingCity);
+        rd.forward(req, res);
+    }
 
-    		cityService.createCity(city);
-    		response.sendRedirect(request.getServletPath() + "?command=list");
-	}
-    
-    private void updateCity(HttpServletRequest request, HttpServletResponse response) 
-			throws SQLException, IOException {		
-    		City city = new City();
-    		city.setName(request.getParameter("name"));       
-    		city.setId(Long.parseLong(request.getParameter("id")));
+    private void insertCity(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException, ServletException {
+        City city = new City();
+        String cityName = request.getParameter("name");
+        Long countryId = Long.parseLong(request.getParameter("countryId"));
+        Country country = countryService.findCountryById(countryId);
+        String err = "";
+        if (country == null) {
+            err = "Country is not existed";
+        } else if (cityName.isEmpty() || countryId == null) {
+            err = "Please fill in necessary information";
+        } else if (!cityService.checkExistCity(cityName, null)) {
+            err = "City is already existed";
+        }
 
-    		cityService.updateCity(city);
-    		response.sendRedirect(request.getServletPath() + "?command=list");
-		    
-	}
-    
+        if (err.length() == 0) {
+            city.setName(request.getParameter("name"));
+            city.setCountryId(countryId);
+            cityService.createCity(city);
+            response.sendRedirect(request.getServletPath() + "?command=list");
+        } else {
+            request.setAttribute("err", err);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=new");
+            dispatcher.forward(request, response);
+        }
+    }
+
+    private void updateCity(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        request.setCharacterEncoding("utf-8");
+        response.setCharacterEncoding("utf-8");
+        Long id = Long.parseLong(request.getParameter("id"));
+        String name = request.getParameter("name");
+        String oldName = request.getParameter("oldCityName");
+        Long countryId = Long.parseLong(request.getParameter("countryId"));
+        String err = "";
+        String url;
+
+        if (name.isEmpty()) {
+            err = "Please fill in necessary information";
+        } else if (countryService.findCountryById(countryId) == null) {
+            err = "Country is not existed";
+        } else if (!countryService.checkExistCountry(name, oldName)) {
+            err = "City is already existed";
+        }
+
+        try {
+            if (err.length() == 0) {
+                City city = new City(id, name, countryId, countryService.findCountryById(countryId));
+                cityService.updateCity(city);
+                response.sendRedirect(request.getServletPath() + "?command=list");
+            } else {
+                url = "/city-form.jsp";
+                RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(url);
+                request.setAttribute("error", err);
+                requestDispatcher.forward(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void deleteCity(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
-        	Long id = Long.parseLong(request.getParameter("id"));
-        	cityService.deleteCity(id);
-        	response.sendRedirect(request.getServletPath() + "?command=list");
+        Long id = Long.parseLong(request.getParameter("id"));
+        cityService.deleteCity(id);
+        response.sendRedirect(request.getServletPath() + "?command=list");
     }
-    
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        	request.setCharacterEncoding("utf-8");
-        	response.setCharacterEncoding("utf-8");
-        	Long id = Long.parseLong(request.getParameter("id"));
-        	String name = request.getParameter("name");
-        	City city = new City();
-        	String err = "";
-        	String url = "/city-form.jsp";
 
-        	if (name.isEmpty()) {
-        		err = "Please fill in necessary information";
-        	}
-        
-
-        	if (err.length() > 0) {
-        		request.setAttribute("error", err);
-        	}
-
-        	try {
-        		if (err.length() == 0) {
-        			city = new City(id, name);
-        			cityService.updateCity(city);
-        			url = "/home.jsp";
-        		} else {
-        			url = "/city-form.jsp";
-        		}
-        		RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(url);
-        		requestDispatcher.forward(request, response);
-        	} catch (Exception e) {
-        		e.printStackTrace();
-        	}
-    	}
-	}
+}
