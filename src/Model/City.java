@@ -23,6 +23,18 @@ public class City {
     @Column(name = "country_id")
     private Long countryId;
 
+    @Column(name = "recovered")
+    private int recovered;
+
+    @Column(name = "infected")
+    private int infected;
+
+    @Column(name = "critical")
+    private int critical;
+
+    @Column(name = "death")
+    private int death;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Country country;

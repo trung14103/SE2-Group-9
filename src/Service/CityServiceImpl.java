@@ -1,7 +1,6 @@
 package Service;
 
 import Model.City;
-import Model.Country;
 import Utils.DBConnect;
 
 import java.sql.Connection;
@@ -20,9 +19,9 @@ public class CityServiceImpl implements CityService {
 
     private static String DELETE_CITY_BY_ID = "DELETE FROM cities WHERE id = ?;";
 
-    private static String UPDATE_CITY_BY_ID = "UPDATE cities SET name = ?, country_id = ?;";
+    private static String UPDATE_CITY_BY_ID = "UPDATE cities SET name = ?, country_id = ?, recovered = ?, infected = ?, critical = ?, death = ? WHERE id = ?;";
 
-    private static String INSERT_CITY = "INSERT INTO cities (name, country_id) VALUES (?, ?);";
+    private static String INSERT_CITY = "INSERT INTO cities (name, country_id, recovered,infected, critical, death ) VALUES (?, ?, ?, ?, ?, ?);";
 
     private static CountryService countryService = new CountryServiceImpl();
 
@@ -40,6 +39,10 @@ public class CityServiceImpl implements CityService {
                 city.setId(rs.getLong("id"));
                 city.setName(rs.getString("name"));
                 city.setCountryId(rs.getLong("country_id"));
+                city.setRecovered(rs.getInt("recovered"));
+                city.setInfected(rs.getInt("infected"));
+                city.setCritical(rs.getInt("critical"));
+                city.setDeath(rs.getInt("death"));
                 city.setCountry(countryService.findCountryById(rs.getLong("country_id")));
                 cityList.add(city);
             }
@@ -59,6 +62,11 @@ public class CityServiceImpl implements CityService {
             PreparedStatement ps = con.prepareStatement(UPDATE_CITY_BY_ID);
             ps.setString(1, city.getName());
             ps.setLong(2, city.getCountryId());
+            ps.setInt(3, city.getRecovered());
+            ps.setInt(4, city.getInfected());
+            ps.setInt(5, city.getCritical());
+            ps.setInt(6, city.getDeath());
+            ps.setLong(7, city.getId());
             ps.executeUpdate();
             con.close();
         } catch (SQLException throwables) {
@@ -73,6 +81,10 @@ public class CityServiceImpl implements CityService {
             PreparedStatement ps = con.prepareStatement(INSERT_CITY);
             ps.setString(1, city.getName());
             ps.setLong(2, city.getCountryId());
+            ps.setInt(3, city.getRecovered());
+            ps.setInt(4, city.getInfected());
+            ps.setInt(5, city.getCritical());
+            ps.setInt(6, city.getDeath());
             ps.executeUpdate();
             con.close();
         } catch (SQLException throwables) {
@@ -92,6 +104,10 @@ public class CityServiceImpl implements CityService {
                 city.setId(rs.getLong("id"));
                 city.setName(rs.getString("name"));
                 city.setCountryId(rs.getLong("country_id"));
+                city.setRecovered(rs.getInt("recovered"));
+                city.setInfected(rs.getInt("infected"));
+                city.setCritical(rs.getInt("critical"));
+                city.setDeath(rs.getInt("death"));
             }
             con.close();
         } catch (SQLException throwables) {
@@ -118,9 +134,9 @@ public class CityServiceImpl implements CityService {
         if (!cityName.isEmpty()) {
             City flagCity = findCityByName(cityName);
             if (oldCityName == null) {
-                return flagCity.getId() == null;
+                return flagCity.getName() == null;
             } else {
-                return cityName.equals(oldCityName) || flagCity.getId() == null;
+                return cityName.equals(oldCityName) || flagCity.getName() == null;
             }
         }
         return true;

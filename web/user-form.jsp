@@ -76,7 +76,7 @@
 
                                     <c:if test="${user != null}">
                                         <input type="hidden" name="id" value="<c:out value='${user.id}' />" />
-                                        <input type="hidden" name="oldUserName" value="<c:out value='${user.username}' />"/>
+                                        <input type="hidden" name="oldUsername" value="<c:out value='${user.username}' />"/>
                                     </c:if>
 
 
@@ -85,6 +85,9 @@
                                         <label for="inputUserName">Username</label>
                                         <input id="inputUserName" type="text" name="username" value="<c:out value='${user.username}' />" data-parsley-trigger="change" required="" placeholder="Username" autocomplete="off" class="form-control">
                                         <label id="err"></label>
+                                        <c:if test="${error!= null}">
+                                            <li style="color: red"><%=request.getAttribute("error")%></li>
+                                        </c:if>
                                     </div>
                                     <div class="form-group">
                                         <label for="inputPassword">Password</label>

@@ -94,7 +94,7 @@ public class CountryController extends HttpServlet {
             response.sendRedirect(request.getServletPath() + "?command=list");
         } else {
             RequestDispatcher rd = request.getRequestDispatcher("/country-form.jsp");
-            request.setAttribute("err", "Country is already existed");
+            request.setAttribute("error", "Country is already existed");
             rd.forward(request, response);
         }
     }
@@ -104,19 +104,18 @@ public class CountryController extends HttpServlet {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
         Country country = new Country();
+        Long id = Long.parseLong(request.getParameter("id"));
         String name = request.getParameter("name");
         String continent = request.getParameter("continent");
+        String oldCountryName = request.getParameter("oldCountryName");
 
         String err = "";
         String url = "/country-form.jsp";
 
         if (name.isEmpty() || continent.isEmpty()) {
             err = "Please fill in necessary information";
-        }
-
-
-        if (err.length() > 0) {
-            request.setAttribute("error", err);
+        } if (!countryService.checkExistCountry(name, oldCountryName)) {
+            err = "Country is already existed";
         }
 
         try {
@@ -124,14 +123,15 @@ public class CountryController extends HttpServlet {
                 country.setName(request.getParameter("name"));
                 country.setUpdated_day(new Date());
                 country.setContinent(request.getParameter("continent"));
-                country.setId(Long.parseLong(request.getParameter("id")));
+                country.setId(id);
 
                 countryService.updateCountry(country);
                 response.sendRedirect(request.getServletPath() + "?command=list");
             } else {
                 url = "/country-form.jsp";
-                RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(url);
-                requestDispatcher.forward(request, response);
+                request.setAttribute("error", err);
+                RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=edit&id=" + id);
+                dispatcher.forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="./assets/vendor/fonts/fontawesome/css/fontawesome-all.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">  
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" defer></script>
 
@@ -26,46 +26,69 @@
     <script src='./assets/libs/js/main.js' defer></script>
 </head>
 <body>
-  <nav class="navbar navbar-expand-md bg-dark navbar-dark"> 
-    <!--button sidenav-->
-    <button class="bg-dark" type="button" onclick="openNav()">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+<nav class="navbar navbar-expand-lg bg-light navbar-white">
+
     <!--Navbar items-->
-   <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#">Sign In</a>
-        </li>
-      </ul>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="home">Home</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="world">World</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="continent">Continent</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#">About</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <c:if test="${username == null}">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="login?command=view">Log In</a>
+                        </li>
+                    </ul>
+                </c:if>
+                <c:if test="${username != null}">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="user?command=view">Admin Page</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="logout">Log Out</a>
+                        </li>
+                    </ul>
+                </c:if>
+            </li>
+        </ul>
     </div>
-  </nav>
-  <!--Sidenav-->
-  <div id="mySidenav" class="sidenav">
-    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#">Home</a>
-    <a href="#" class="active">About</a>
-    <a href="#">Contact</a>
-  </div>
-  
+</nav>
+
 <div class="container-fluid">
-  <!-- Row 1 -->
     <div class="row">
         <div class="col">
             <h2 class="header-box">ABOUT US</h2>
-            <p>Group 9 - Students from FIT, Faculty of Information Technology - HANU, Hanoi University.
-                <br> This is a project for SE2 course - Software Engineer 2.
-            </p>
         </div>
     </div>
 </div>
-    <div class="footer">
-      Copyright &copy; 2020 by Supernho Corp.
-    </div>
 
-    <!--Opt JS-->
-    <script src="./assets/vendor/jquery/jquery-3.3.1.min.js"></script>
-    <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
-    <script src="./assets/vendor/slimscroll/jquery.slimscroll.js"></script>
+<div class="container">
+    <br>
+    <p>Group 9 - Students from FIT, Faculty of Information Technology - HANU, Hanoi University.
+        <br> This is a project for SE2 course - Software Engineer 2.
+    </p>
+</div>
+<!-- <div class="footer">
+  Copyright &copy; 2020 by Supernho Corp.
+</div> -->
+
+<!--Opt JS-->
+<script src="./assets/vendor/jquery/jquery-3.3.1.min.js"></script>
+<script src="./assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
+<script src="./assets/vendor/slimscroll/jquery.slimscroll.js"></script>
 </body>
 </html>

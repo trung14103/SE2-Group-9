@@ -16,7 +16,7 @@ public class UserServiceImpl implements UserService {
 
     private static String DELETE_USER_BY_ID = "DELETE FROM users WHERE id = ?;";
 
-    private static String UPDATE_USER_BY_ID = "UPDATE users SET username = ?, password = ?, email = ?, address =?, role = ?;";
+    private static String UPDATE_USER_BY_ID = "UPDATE users SET username = ?, password = ?, email = ?, address =?, role = ? WHERE id = ?;";
 
     private static String INSERT_USER = "INSERT INTO users ( username, password, email, address, role, created_date) VALUES (?, ?, ?, ?, ?, ?);";
 
@@ -61,6 +61,7 @@ public class UserServiceImpl implements UserService {
             ps.setString(3, user.getEmail());
             ps.setString(5, user.getRole());
             ps.setString(4, user.getAddress());
+            ps.setLong(6, user.getId());
             ps.executeUpdate();
             con.close();
         } catch (SQLException throwables) {
@@ -171,7 +172,7 @@ public class UserServiceImpl implements UserService {
             if (oldUsername == null) {
                 return flagUser.getUsername() == null;
             } else {
-                return username.equals(oldUsername) || flagUser == null;
+                return username.equals(oldUsername) || flagUser.getUsername() == null;
             }
         }
         return true;

@@ -59,4 +59,26 @@ body {
     background-color: #777;
     color: white;
     text-align: center;
+    padding: 10px;
+}
+
+.table-fixed {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.table-fixed tbody {
+    display: block;
+    height: 200px;
+    overflow-y: auto;
+    max-width: 100%
+}
+
+.table-fixed thead tr {
+    display: block;
+}
+
+.table-fixed th, td{
+    padding: 5px;
+    width: 25%;
 }

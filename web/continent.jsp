@@ -5,7 +5,7 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Statistics</title>
+    <title>World Covid-19 Statistics</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="./assets/libs/css/main.css">
@@ -31,14 +31,14 @@
     <!--Navbar items-->
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="home">Home</a>
             </li>
             <li class="nav-item ">
                 <a class="nav-link" href="world">World</a>
             </li>
-            <li class="nav-item ">
-                <a class="nav-link" href="continent">Continent</a>
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Continent</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="about">About</a>
@@ -59,7 +59,7 @@
                             <a class="nav-link" href="user?command=view">Admin Page</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="logout">Log Out</a>
+                        	<a class="nav-link" href="logout">Log Out</a>
                         </li>
                     </ul>
                 </c:if>
@@ -67,64 +67,40 @@
         </ul>
     </div>
 </nav>
-
 <div class="container-fluid">
-    <!-- Row 1 -->
-    <div class="row">
-        <div class="col">
-            <h2 class="header-box">GLOBAL</h2>
-            <img src="./assets/images/unflag.gif" class="flag" alt="global"/>
-            <div class="infowrap">
-                <div class="col-md-4">
-                    <div class="cases">INFECTED
-                        <br>
-                        <c:out value="${sumGlobal.infected}"/></div>
-                </div>
-                <div class="col-md-4">
-                    <div class="deaths">DEATHS
-                        <br>
-                        <c:out value="${sumGlobal.death}"/></div>
-                </div>
-                <div class="col-md-4">
-                    <div class="recover">RECOVERED
-                        <br>
-                        <c:out value="${sumGlobal.recovered}"/></div>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <h2 class="header-box">VIETNAM</h2>
-            <img src="./assets/images/VN.png" class="flag" alt="VN Flag"/>
-            <div class="infowrap">
-                <div class="col-md-4">
-                    <div class="cases">INFECTED
-                        <br>
-                        <c:out value="${ovnData.infected}"/></div>
-                </div>
-                <div class="col-md-4">
-                    <div class="deaths">DEATHS
-                        <br>
-                        <c:out value="${ovnData.death}"/></div>
-                </div>
-                <div class="col-md-4">
-                    <div class="recover">RECOVERED
-                        <br>
-                        <c:out value="${ovnData.recovered}"/></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <br/>
-</div>
-<br>
-<!--Row 2-->
+      <div class="row">
+          <div class="col">
+              <h2 class="header-box">Statistics</h2>
+          </div>
+      </div>
+  </div>
+  <br>
 <div class="container">
     <div class="row">
         <div class="col">
-            <table class="table table-fixed">
+        <form action="continent" id="contform">
+        <div class="form-group">
+        <label for "continent">Continent:</label>
+        <select id="continent" name="continent" form="contform" class="form-control">
+            <option value="">Choose continent</option>
+            <option value="Africa">Africa</option>
+            <option value="America">America</option>
+            <option value="Antarctica">Antarctica</option>
+            <option value="Asia">Asia</option>
+            <option value="Europe">Europe</option>
+            <option value="Oceania">Oceania</option>
+        </select>
+        </div>
+        <div class="form-group">
+        <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+        </form>
+            <div class="table responsive">
+            <table class="table first table-bordered">
                 <thead class="thead-light">
                 <tr>
-                    <th>City, Province</th>
+                    <th>Country</th>
+                    <th>Continent</th>
                     <th>Infected</th>
                     <th>Critical</th>
                     <th>Death</th>
@@ -132,18 +108,19 @@
                 </tr>
                 </thead>
                 <tbody>
+                   <c:forEach var="generalData" items="${generalData}">
                 <tr>
-                    <c:forEach var="vnData" items="${vnData}">
-                <tr>
-                    <td><c:out value="${vnData.name}"/></td>
-                    <td><c:out value="${vnData.infected}"/></td>
-                    <td><c:out value="${vnData.critical}"/></td>
-                    <td><c:out value="${vnData.death}"/></td>
-                    <td><c:out value="${vnData.recovered}"/></td>
+                    <td><c:out value="${generalData.getCountry().getName()}"/></td>
+                    <td><c:out value="${generalData.getCountry().getContinent()}"/></td>
+                    <td><c:out value="${generalData.infected}"/></td>
+                    <td><c:out value="${generalData.critical}"/></td>
+                    <td><c:out value="${generalData.death}"/></td>
+                    <td><c:out value="${generalData.recovered}"/></td>
                 </tr>
                 </c:forEach>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 </div>

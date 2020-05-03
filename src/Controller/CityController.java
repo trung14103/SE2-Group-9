@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -84,6 +83,7 @@ public class CityController extends HttpServlet {
             throws SQLException, ServletException, IOException {
         Long id = Long.parseLong(req.getParameter("id"));
         City existingCity = cityService.findCityById(id);
+        existingCity.setCountry(countryService.findCountryById(existingCity.getCountryId()));
 
         RequestDispatcher rd = req.getRequestDispatcher("/city-form.jsp");
         req.setAttribute("city", existingCity);
@@ -94,24 +94,34 @@ public class CityController extends HttpServlet {
             throws SQLException, IOException, ServletException {
         City city = new City();
         String cityName = request.getParameter("name");
-        Long countryId = Long.parseLong(request.getParameter("countryId"));
-        Country country = countryService.findCountryById(countryId);
-        String err = "";
-        if (country == null) {
-            err = "Country is not existed";
-        } else if (cityName.isEmpty() || countryId == null) {
-            err = "Please fill in necessary information";
-        } else if (!cityService.checkExistCity(cityName, null)) {
-            err = "City is already existed";
+        String countryName = request.getParameter("countryName");
+        Country country = countryService.findCountryByName(countryName);
+        int recovered = Integer.parseInt(request.getParameter("recovered"));
+        int infected = Integer.parseInt(request.getParameter("infected"));
+        int critical = Integer.parseInt(request.getParameter("critical"));
+        int death = Integer.parseInt(request.getParameter("death"));
+        String errCity = "";
+        String errCountry = "";
+        if (country.getId() == null) {
+            errCountry = "Country is not existed";
+        } if (cityName.isEmpty() || countryName == null) {
+            errCity = "Please fill in necessary information";
+        } if (!cityService.checkExistCity(cityName, null)) {
+            errCity = "City is already existed";
         }
 
-        if (err.length() == 0) {
+        if (errCity.length() == 0 && errCountry.length() == 0) {
             city.setName(request.getParameter("name"));
-            city.setCountryId(countryId);
+            city.setCountryId(country.getId());
+            city.setCritical(critical);
+            city.setDeath(death);
+            city.setInfected(infected);
+            city.setRecovered(recovered);
             cityService.createCity(city);
             response.sendRedirect(request.getServletPath() + "?command=list");
         } else {
-            request.setAttribute("err", err);
+            request.setAttribute("errorCity", errCity);
+            request.setAttribute("errorCountry", errCountry);
             RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=new");
             dispatcher.forward(request, response);
         }
@@ -125,12 +135,17 @@ public class CityController extends HttpServlet {
         String name = request.getParameter("name");
         String oldName = request.getParameter("oldCityName");
         Long countryId = Long.parseLong(request.getParameter("countryId"));
+        Country country = countryService.findCountryById(countryId);
+        int recovered = Integer.parseInt(request.getParameter("recovered"));
+        int infected = Integer.parseInt(request.getParameter("infected"));
+        int critical = Integer.parseInt(request.getParameter("critical"));
+        int death = Integer.parseInt(request.getParameter("death"));
         String err = "";
         String url;
 
         if (name.isEmpty()) {
             err = "Please fill in necessary information";
-        } else if (countryService.findCountryById(countryId) == null) {
+        } else if (country.getId() == null) {
             err = "Country is not existed";
         } else if (!countryService.checkExistCountry(name, oldName)) {
             err = "City is already existed";
@@ -138,14 +153,14 @@ public class CityController extends HttpServlet {
 
         try {
             if (err.length() == 0) {
-                City city = new City(id, name, countryId, countryService.findCountryById(countryId));
+                City city = new City(id, name, countryId, recovered, infected, critical, death, countryService.findCountryById(countryId));
                 cityService.updateCity(city);
                 response.sendRedirect(request.getServletPath() + "?command=list");
             } else {
                 url = "/city-form.jsp";
-                RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(url);
+                RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=edit&id=" + id);
                 request.setAttribute("error", err);
-                requestDispatcher.forward(request, response);
+                dispatcher.forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();

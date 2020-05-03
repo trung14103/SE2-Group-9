@@ -15,5 +15,11 @@ public interface GeneralDataService {
     void createGeneralData(GeneralData GeneralData);
 
     void deleteGeneralData(int id);
+
+    List<GeneralData> findCityOfVietnam();
+
+    GeneralData findByCountryId(Long id);
+
+    public List<GeneralData> findByContinent(String continent);
     
 }

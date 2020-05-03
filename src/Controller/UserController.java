@@ -105,6 +105,7 @@ public class UserController extends HttpServlet {
         String address = request.getParameter("address");
         String password = request.getParameter("password");
         String role = request.getParameter("role");
+        String oldUsername = request.getParameter("oldUsername");
         Date created_date = new Date();
 
         String err = "";
@@ -112,6 +113,8 @@ public class UserController extends HttpServlet {
 
         if (username.isEmpty() || email.isEmpty() || address.isEmpty() || password.isEmpty() || role.isEmpty()) {
             err = "Please fill in necessary information";
+        } else if (!userService.checkExistUser(username, oldUsername)) {
+            err = "User is already existed";
         }
 //        else {
 //            PatternChecker patternChecker = new PatternChecker();
@@ -119,10 +122,6 @@ public class UserController extends HttpServlet {
 //                err = "Invalid Email Format";
 //            }
 //        }
-
-        if (err.length() > 0) {
-            request.setAttribute("error", err);
-        }
 
         try {
             if (err.length() == 0) {
@@ -132,8 +131,9 @@ public class UserController extends HttpServlet {
             } else {
                 url = "/user-form.jsp";
             }
-            RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(url);
-            requestDispatcher.forward(request, response);
+            request.setAttribute("error", err);
+            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=edit&id=" + id);
+            dispatcher.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,7 +167,7 @@ public class UserController extends HttpServlet {
             response.sendRedirect(request.getServletPath() + "?command=list");
         } else {
             RequestDispatcher dispatcher = request.getRequestDispatcher("/user-form.jsp");
-            request.setAttribute("err", "User is already existed");
+            request.setAttribute("error", "User is already existed");
             dispatcher.forward(request, response);
         }
     }
