@@ -94,8 +94,8 @@ public class CityController extends HttpServlet {
             throws SQLException, IOException, ServletException {
         City city = new City();
         String cityName = request.getParameter("name");
-        String countryName = request.getParameter("countryName");
-        Country country = countryService.findCountryByName(countryName);
+        Long countryId = Long.parseLong(request.getParameter("countryId"));
+        Country country = countryService.findCountryById(countryId);
         int recovered = Integer.parseInt(request.getParameter("recovered"));
         int infected = Integer.parseInt(request.getParameter("infected"));
         int critical = Integer.parseInt(request.getParameter("critical"));
@@ -104,7 +104,7 @@ public class CityController extends HttpServlet {
         String errCountry = "";
         if (country.getId() == null) {
             errCountry = "Country is not existed";
-        } if (cityName.isEmpty() || countryName == null) {
+        } if (cityName.isEmpty()) {
             errCity = "Please fill in necessary information";
         } if (!cityService.checkExistCity(cityName, null)) {
             errCity = "City is already existed";
@@ -118,11 +118,11 @@ public class CityController extends HttpServlet {
             city.setInfected(infected);
             city.setRecovered(recovered);
             cityService.createCity(city);
-            response.sendRedirect(request.getServletPath() + "?command=list");
+            response.sendRedirect("city?command=list");
         } else {
             request.setAttribute("errorCity", errCity);
             request.setAttribute("errorCountry", errCountry);
-            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=new");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("city?command=new");
             dispatcher.forward(request, response);
         }
     }
@@ -155,10 +155,10 @@ public class CityController extends HttpServlet {
             if (err.length() == 0) {
                 City city = new City(id, name, countryId, recovered, infected, critical, death, countryService.findCountryById(countryId));
                 cityService.updateCity(city);
-                response.sendRedirect(request.getServletPath() + "?command=list");
+                response.sendRedirect("city?command=list");
             } else {
                 url = "/city-form.jsp";
-                RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=edit&id=" + id);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("city?command=edit&id=" + id);
                 request.setAttribute("error", err);
                 dispatcher.forward(request, response);
             }
@@ -171,7 +171,7 @@ public class CityController extends HttpServlet {
             throws SQLException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
         cityService.deleteCity(id);
-        response.sendRedirect(request.getServletPath() + "?command=list");
+        response.sendRedirect("city?command=list");
     }
 
 }

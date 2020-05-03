@@ -77,8 +77,8 @@ public class UserServiceImpl implements UserService {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getEmail());
-            ps.setString(4, user.getRole());
-            ps.setString(5, user.getAddress());
+            ps.setString(5, user.getRole());
+            ps.setString(4, user.getAddress());
             ps.setDate(6, convertDate(user.getCreated_date()));
             ps.executeUpdate();
             con.close();

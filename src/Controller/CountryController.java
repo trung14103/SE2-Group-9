@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -91,7 +89,7 @@ public class CountryController extends HttpServlet {
             country.setUpdated_day(new Date());
             country.setContinent(request.getParameter("continent"));
             countryService.createCountry(country);
-            response.sendRedirect(request.getServletPath() + "?command=list");
+            response.sendRedirect("country?command=list");
         } else {
             RequestDispatcher rd = request.getRequestDispatcher("/country-form.jsp");
             request.setAttribute("error", "Country is already existed");
@@ -126,11 +124,11 @@ public class CountryController extends HttpServlet {
                 country.setId(id);
 
                 countryService.updateCountry(country);
-                response.sendRedirect(request.getServletPath() + "?command=list");
+                response.sendRedirect("country?command=list");
             } else {
                 url = "/country-form.jsp";
                 request.setAttribute("error", err);
-                RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=edit&id=" + id);
+                RequestDispatcher dispatcher = request.getRequestDispatcher("country?command=edit&id=" + id);
                 dispatcher.forward(request, response);
             }
         } catch (Exception e) {
@@ -143,7 +141,7 @@ public class CountryController extends HttpServlet {
             throws SQLException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
         countryService.deleteCountry(id);
-        response.sendRedirect(request.getServletPath() + "?command=list");
+        response.sendRedirect("country?command=list");
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

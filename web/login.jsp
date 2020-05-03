@@ -46,7 +46,7 @@
                 </c:if>
             <div class="input-container">
                 <i class="fas fa-lock" aria-hidden="true"></i>
-                <input id="inputPws" type="text" name="password"
+                <input id="inputPws" type="password" name="password"
                        data-parsley-trigger="change" required="" placeholder="Password"
                        autocomplete="off" class="input-field">
             </div>

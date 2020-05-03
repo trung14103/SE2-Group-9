@@ -107,12 +107,12 @@ public class GeneralDataController extends HttpServlet {
             generalData.setCountry(country);
             generalData.setCity(city);
             generalDataService.createGeneralData(generalData);
-            response.sendRedirect(request.getContextPath() + "/generalData?command=list");
+            response.sendRedirect("generalData?command=list");
         }
         else {
             String err = "City or Country is not existed";
             request.setAttribute("err", err);
-            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=new");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("generalData?command=new");
             dispatcher.forward(request, response);
         };
     }
@@ -131,11 +131,11 @@ public class GeneralDataController extends HttpServlet {
         if (country != null) {
             GeneralData GeneralData = new GeneralData(id, recovered, infected, critical, death, country_id, city_id,country,city);
             generalDataService.updateGeneralData(GeneralData);
-            response.sendRedirect(request.getContextPath() + "/generalData?command=list");}
+            response.sendRedirect("generalData?command=list");}
         else {
             String err = "City or Country is not existed";
             request.setAttribute("err", err);
-            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=new");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("generalData?command=new");
             dispatcher.forward(request, response);
         };
     }
@@ -144,6 +144,6 @@ public class GeneralDataController extends HttpServlet {
             throws SQLException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         generalDataService.deleteGeneralData(id);
-        response.sendRedirect(request.getContextPath() + "/generalData?command=list");
+        response.sendRedirect("generalData?command=list");
     }
 }

@@ -132,7 +132,7 @@ public class UserController extends HttpServlet {
                 url = "/user-form.jsp";
             }
             request.setAttribute("error", err);
-            RequestDispatcher dispatcher = request.getRequestDispatcher(request.getServletPath() + "?command=edit&id=" + id);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("user?command=edit&id=" + id);
             dispatcher.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,7 +143,7 @@ public class UserController extends HttpServlet {
             throws SQLException, IOException {
         Long id = Long.parseLong(request.getParameter("id"));
         userService.deleteUser(id);
-        response.sendRedirect(request.getServletPath() + "?command=list");
+        response.sendRedirect("user?command=list");
     }
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -164,7 +164,7 @@ public class UserController extends HttpServlet {
             user.setCreated_date(new Date());
 
             userService.createUser(user);
-            response.sendRedirect(request.getServletPath() + "?command=list");
+            response.sendRedirect("user?command=list");
         } else {
             RequestDispatcher dispatcher = request.getRequestDispatcher("/user-form.jsp");
             request.setAttribute("error", "User is already existed");
