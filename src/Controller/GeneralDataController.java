@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 @WebServlet("/generalData")
@@ -106,6 +107,7 @@ public class GeneralDataController extends HttpServlet {
             generalData.setCountry_id(country_id);
             generalData.setCountry(country);
             generalData.setCity(city);
+            generalData.setUpdatedDay(new Date());
             generalDataService.createGeneralData(generalData);
             response.sendRedirect("generalData?command=list");
         }
@@ -129,7 +131,7 @@ public class GeneralDataController extends HttpServlet {
         Country country = countryService.findCountryById(country_id);
         City city = cityService.findCityById(city_id);
         if (country != null) {
-            GeneralData GeneralData = new GeneralData(id, recovered, infected, critical, death, country_id, city_id,country,city);
+            GeneralData GeneralData = new GeneralData(id, recovered, infected, critical, death, country_id, city_id, new Date(), country,city);
             generalDataService.updateGeneralData(GeneralData);
             response.sendRedirect("generalData?command=list");}
         else {

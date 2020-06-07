@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -34,6 +35,9 @@ public class GeneralData {
 
     @Column(name = "city_id")
     private long city_id;
+
+    @Column(name = "updated_day")
+    private Date updatedDay;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "country_id")

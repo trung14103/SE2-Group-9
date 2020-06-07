@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,8 +22,8 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" defer></script>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js" defer></script>
     <script src='./assets/libs/js/main.js' defer></script>
+    <script src='./assets/vendor/charts/charts-bundle/Chart.bundle.js' defer></script>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-light navbar-white">
@@ -59,7 +59,7 @@
                             <a class="nav-link" href="user?command=view">Admin Page</a>
                         </li>
                         <li class="nav-item">
-                        	<a class="nav-link" href="logout">Log Out</a>
+                            <a class="nav-link" href="logout">Log Out</a>
                         </li>
                     </ul>
                 </c:if>
@@ -68,38 +68,41 @@
     </div>
 </nav>
 <div class="container-fluid">
-      <div class="row">
-          <div class="col">
-              <h2 class="header-box">World Statistics</h2>
-          </div>
-      </div>
-  </div>
-<div class="container">
     <div class="row">
         <div class="col">
+            <h2 class="header-box">World Statistics</h2>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div class="col-md-12">
             <div class="table responsive">
-            <table class="table first table-bordered">
-                <thead class="thead-light">
-                <tr>
-                    <th>Country</th>
-                    <th>Infected</th>
-                    <th>Critical</th>
-                    <th>Death</th>
-                    <th>Recovered</th>
-                </tr>
-                </thead>
-                <tbody>
-                   <c:forEach var="generalData" items="${generalData}">
-                <tr>
-                    <td><c:out value="${generalData.getCountry().getName()}"/></td>
-                    <td><c:out value="${generalData.infected}"/></td>
-                    <td><c:out value="${generalData.critical}"/></td>
-                    <td><c:out value="${generalData.death}"/></td>
-                    <td><c:out value="${generalData.recovered}"/></td>
-                </tr>
-                </c:forEach>
-                </tbody>
-            </table>
+                <table class="table first table-bordered">
+                    <thead class="thead-light">
+                    <tr>
+                        <th>Country</th>
+                        <th>Infected</th>
+                        <th>Critical</th>
+                        <th>Death</th>
+                        <th>Recovered</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach var="generalData" items="${generalData}">
+                        <tr>
+                            <td><c:out value="${generalData.getCountry().getName()}"/></td>
+                            <td><c:out value="${generalData.infected}"/></td>
+                            <td><c:out value="${generalData.critical}"/></td>
+                            <td><c:out value="${generalData.death}"/></td>
+                            <td><c:out value="${generalData.recovered}"/></td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -112,5 +115,70 @@
 <script src="./assets/vendor/jquery/jquery-3.3.1.min.js"></script>
 <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
 <script src="./assets/vendor/slimscroll/jquery.slimscroll.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script type="text/javascript">
+    var myChart = document.getElementById("myChart").getContext("2d");
+    var states = [];
+    var confirmed = [];
+    var recovered = [];
+    var deaths = [];
+    $.ajax({
+        async: false,
+
+        url: "data",
+
+        dataType: "json",
+
+        success: function (data) {
+            $.each(data, function (index, obj) {
+                states.push(obj.country.name);
+                confirmed.push(obj.infected);
+                recovered.push(obj.recovered);
+                deaths.push(obj.death);
+            });
+        }
+    })
+    var chart = new Chart(myChart, {
+        type: "line",
+        data: {
+            labels: states,
+            datasets: [
+                {
+                    label: "Confirmed Cases",
+                    data: confirmed,
+                    backgroundColor: "#f1c40f",
+                    minBarLength: 100,
+                    lineTension: 0,
+                    fill: false,
+                    borderColor: "#f1c40f"
+                },
+                {
+                    label: "Recovered",
+                    data: recovered,
+                    backgroundColor: "#2ecc71",
+                    minBarLength: 100,
+                    fill: false,
+                    borderColor: "#2ecc71"
+                },
+                {
+                    label: "Deceased",
+                    data: deaths,
+                    backgroundColor: "#e74c3c",
+                    minBarLength: 100,
+                    fill: false,
+                    borderColor: "#e74c3c"
+                },
+            ],
+        },
+        option: {
+            elements: {
+                line: {
+                    fill: false
+                }
+            }
+        },
+    });
+
+</script>
 </body>
 </html>

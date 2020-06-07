@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -78,17 +78,17 @@
                 <div class="col-md-4">
                     <div class="cases">INFECTED
                         <br>
-                        <c:out value="${sumGlobal.infected}"/></div>
+                        <c:out value="${sumGlobal.totalInfected}"/></div>
                 </div>
                 <div class="col-md-4">
                     <div class="deaths">DEATHS
                         <br>
-                        <c:out value="${sumGlobal.death}"/></div>
+                        <c:out value="${sumGlobal.totalDeath}"/></div>
                 </div>
                 <div class="col-md-4">
                     <div class="recover">RECOVERED
                         <br>
-                        <c:out value="${sumGlobal.recovered}"/></div>
+                        <c:out value="${sumGlobal.totalRecovered}"/></div>
                 </div>
             </div>
         </div>
@@ -119,6 +119,9 @@
 <br>
 <!--Row 2-->
 <div class="container">
+    <div class="col-md-12">
+        <canvas id="myChart"></canvas>
+    </div>
     <div class="row">
         <div class="col">
             <table class="table table-fixed">
@@ -155,5 +158,64 @@
 <script src="./assets/vendor/jquery/jquery-3.3.1.min.js"></script>
 <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
 <script src="./assets/vendor/slimscroll/jquery.slimscroll.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script type="text/javascript">
+    var myChart = document.getElementById("myChart").getContext("2d");
+    var time = [];
+    var confirmed = [];
+    var recovered = [];
+    var deaths = [];
+    $.ajax({
+        async: false,
+
+        url: "totalData",
+
+        dataType: "json",
+
+        success: function (data) {
+            $.each(data, function (index, obj) {
+                time.push(obj.dayItem);
+                confirmed.push(obj.totalInfected);
+                recovered.push(obj.totalRecovered);
+                deaths.push(obj.totalDeath);
+            });
+        }
+    })
+    var chart = new Chart(myChart, {
+        type: "line",
+        data: {
+            labels: time,
+            datasets: [
+                {
+                    label: "Confirmed Cases",
+                    data: confirmed,
+                    backgroundColor: "#f1c40f",
+                    minBarLength: 100,
+                    lineTension: 0,
+                    fill: false,
+                    borderColor: "#f1c40f"
+                },
+                {
+                    label: "Recovered",
+                    data: recovered,
+                    backgroundColor: "#2ecc71",
+                    minBarLength: 100,
+                    fill: false,
+                    borderColor: "#2ecc71"
+                },
+                {
+                    label: "Deceased",
+                    data: deaths,
+                    backgroundColor: "#e74c3c",
+                    minBarLength: 100,
+                    fill: false,
+                    borderColor: "#e74c3c"
+                },
+            ],
+        },
+        option: {},
+    });
+
+</script>
 </body>
 </html>

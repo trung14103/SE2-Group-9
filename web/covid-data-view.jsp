@@ -80,6 +80,7 @@
                                         <th>Critical</th>
                                         <th>Death</th>
                                         <th>Recovered</th>
+                                        <th>Updated Day</th>
                                         <th>Action</th>
                                     </tr>
                                     </thead>
@@ -92,6 +93,7 @@
                                             <td><c:out value="${generalData.critical}"/></td>
                                             <td><c:out value="${generalData.death}"/></td>
                                             <td><c:out value="${generalData.recovered}"/></td>
+                                            <td><c:out value="${generalData.updatedDay}"/></td>
                                             <td>
                                                 <a class="btn btn-info"
                                                    href=<%request.getServletPath();%>"/generalData?command=edit&id=<c:out value='${generalData.id}' />">Edit</a>
